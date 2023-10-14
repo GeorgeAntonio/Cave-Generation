@@ -11,11 +11,19 @@ public class MeshGenerator : MonoBehaviour
     List<int> triangles;
     public void GenerateMesh(int[,]map, float squareSize){
         squareGrid = new SquareGrid(map, squareSize);
+
+        vertices = new List<Vector3>();
+        triangles = new List<int>();
         for(int x=0; x<squareGrid.squares.GetLength(0); x++){
             for(int y=0; y<squareGrid.squares.GetLength(1); y++){
                 TriangulateSquare(squareGrid.squares[x,y]);
             }
         }
+        Mesh mesh = new Mesh();
+        GetComponent<MeshFilter>().mesh = mesh;
+        mesh.vertices = vertices.ToArray();
+        mesh.triangles = triangles.ToArray();
+        mesh.RecalculateNormals();
     }
 
     void TriangulateSquare(Square square){
@@ -80,18 +88,33 @@ public class MeshGenerator : MonoBehaviour
 
     void MeshFromPoints(params Node[] points){
         AssignVertices(points);
+        if(points.Length>=3) 
+            CreateTriangle(points[0], points[1], points[2]);
+        if(points.Length>=4) 
+            CreateTriangle(points[0], points[2], points[3]);
+        if(points.Length>=5) 
+            CreateTriangle(points[0], points[3], points[4]);
+        if(points.Length>=6) 
+            CreateTriangle(points[0], points[4], points[5]);
     }
 
     void AssignVertices(Node[] points){
         for(int i = 0; i<points.Length; i++){
             if(points[i].vertexIndex == -1){
                 points[i].vertexIndex = vertices.Count;
-                vertices.Add(points[i]);
+                vertices.Add(points[i].position);
             }
         }
     }
+    
+    void CreateTriangle(Node a, Node b, Node c){
+        triangles.Add(a.vertexIndex);
+        triangles.Add(b.vertexIndex);
+        triangles.Add(c.vertexIndex);
+    }
 
     void OnDrawGizmos(){
+        /*
         if(squareGrid != null){
             for(int x=0; x<squareGrid.squares.GetLength(0); x++){
                 for(int y=0; y<squareGrid.squares.GetLength(1); y++){
@@ -115,6 +138,7 @@ public class MeshGenerator : MonoBehaviour
                 }
             }
         }
+        */
     }
 
     public class SquareGrid{
