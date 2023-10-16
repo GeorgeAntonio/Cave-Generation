@@ -170,11 +170,11 @@ public class MeshGenerator : MonoBehaviour
         public Node centreTop, centreBottom, centreLeft, centreRight;
         public int configuration;
 
-        public Square(ControlNode _topLeft, ControlNode _topRight, ControlNode _bottomLeft, ControlNode _bottompRight){
+        public Square(ControlNode _topLeft, ControlNode _topRight, ControlNode _bottomRight, ControlNode _bottomLeft){
             topLeft = _topLeft;
             topRight = _topRight;
             bottomLeft = _bottomLeft;
-            bottomRight = _bottompRight;
+            bottomRight = _bottomRight;
 
             centreTop = topLeft.right;
             centreBottom = bottomLeft.right;
