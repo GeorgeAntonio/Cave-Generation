@@ -9,6 +9,8 @@ public class MeshGenerator : MonoBehaviour
     public SquareGrid squareGrid;
     List<Vector3> vertices;
     List<int> triangles;
+
+    Dictionary<int, List<Triangle>> triangleDictionary = new Dictionary<int, List<Triangle>>();
     public void GenerateMesh(int[,]map, float squareSize){
         squareGrid = new SquareGrid(map, squareSize);
 
@@ -111,8 +113,53 @@ public class MeshGenerator : MonoBehaviour
         triangles.Add(a.vertexIndex);
         triangles.Add(b.vertexIndex);
         triangles.Add(c.vertexIndex);
+
+        Triangle triangle = new Triangle(a.vertexIndex, b.vertexIndex, c.vertexIndex);
+        AddTriangleToDictionary(triangle.vertexIndexA, triangle);
+        AddTriangleToDictionary(triangle.vertexIndexB, triangle);
+        AddTriangleToDictionary(triangle.vertexIndexC, triangle);
     }
 
+    void AddTriangleToDictionary(int vertexIndexKey, Triangle triangle){
+        if(triangleDictionary.ContainsKey(vertexIndexKey)){
+            triangleDictionary [vertexIndexKey].Add (triangle);
+        }else{
+            List<Triangle> triangleList = new List<Triangle>();
+            triangleList.Add(triangle);
+            triangleDictionary.Add(vertexIndexKey,triangleList);
+    
+        }
+    }
+
+    bool IsOutLineEdge(int vertexA, int vertexB){
+        List<Triangle>TrianglesContainingVertexA = triangleDictionary [vertexA];
+        int sharedTriangleCount = 0;
+        for(int i=0;i<TrianglesContainingVertexA[i].Count;i++){
+            if(TrianglesContainingVertexA[i].Contains(vertexB)){
+                sharedTriangleCount++;
+                if(sharedTriangleCount>1){
+                    break;
+                }
+            }
+        }
+        return sharedTriangleCount == 1;
+    }
+
+    struct Triangle {
+        public int vertexIndexA;
+        public int vertexIndexB;
+        public int vertexIndexC;
+
+        public Triangle(int a, int b, int c){
+            vertexIndexA = a;
+            vertexIndexB = b;
+            vertexIndexC = c;
+        }
+
+        public bool Contains(int vertexIndex){
+            return vertexIndex == vertexIndexA || vertexIndex == vertexIndexB || vertexIndex == vertexIndexC;
+        }
+    }
     public class SquareGrid{
         public Square[,] squares;
         public SquareGrid(int[,]map, float squareSize){

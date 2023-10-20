@@ -55,7 +55,7 @@ public class MapGenerator : MonoBehaviour
         } 
 
         MeshGenerator meshGen = GetComponent<MeshGenerator>();
-        meshGen.GenerateMesh(map,1);
+        meshGen.GenerateMesh(borderMap,1);
     }
 
 
